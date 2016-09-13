@@ -15,9 +15,11 @@ class OcrView(View):
     def post(self, request, *args, **kwargs):
         with PyTessBaseAPI() as api:
             with Image.open(request.FILES['image']) as image:
-                sharpened_image = image.filter(ImageFilter.SHARPEN)
+                l_image = image.convert('L')
+                sharpened_image = l_image.filter(ImageFilter.SHARPEN)
                 api.SetImage(sharpened_image)
                 utf8_text = api.GetUTF8Text()
 
         return JsonResponse({'utf8_text': utf8_text})
+
 ocr_view = csrf_exempt(OcrView.as_view())
